@@ -157,54 +157,144 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---------- Contact Form Validation ---------- */
-  var contactForm = document.getElementById('contactForm');
-  var formSuccess = document.getElementById('formSuccess');
+  
+/* ---------- Contact Form Validation + WhatsApp Submission ---------- */
 
-  function setFieldError(field, hasError) {
-    field.closest('.form-field').classList.toggle('has-error', hasError);
-  }
+const contactForm = document.getElementById("contactForm");
+const formSuccess = document.getElementById("formSuccess");
 
-  function isValidEmail(value) {
+// Function to show or remove field errors
+function setFieldError(field, hasError) {
+    field.closest(".form-field").classList.toggle("has-error", hasError);
+}
+
+// Function to validate email
+function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  }
+}
 
-  if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      formSuccess.classList.remove('is-visible');
+// Check if the form exists
+if (contactForm) {
 
-      var nameField = document.getElementById('name');
-      var emailField = document.getElementById('email');
-      var messageField = document.getElementById('message');
+    contactForm.addEventListener("submit", function (event) {
 
-      var nameValid = nameField.value.trim().length > 0;
-      var emailValid = isValidEmail(emailField.value.trim());
-      var messageValid = messageField.value.trim().length > 0;
+        // Stop normal form submission
+        event.preventDefault();
 
-      setFieldError(nameField, !nameValid);
-      setFieldError(emailField, !emailValid);
-      setFieldError(messageField, !messageValid);
+        // Hide previous success message
+        formSuccess.classList.remove("is-visible");
 
-      if (nameValid && emailValid && messageValid) {
-        formSuccess.classList.add('is-visible');
-        contactForm.reset();
-      } else {
-        var firstInvalid = contactForm.querySelector('.has-error input, .has-error textarea');
-        if (firstInvalid) firstInvalid.focus();
-      }
-    });
+        /* ---------- Get Form Fields ---------- */
 
-    ['name', 'email', 'message'].forEach(function (id) {
-      var field = document.getElementById(id);
-      field.addEventListener('input', function () {
-        if (id === 'email') {
-          setFieldError(field, field.value.trim().length > 0 && !isValidEmail(field.value.trim()));
-        } else {
-          setFieldError(field, false);
+        const nameField = document.getElementById("name");
+        const emailField = document.getElementById("email");
+        const messageField = document.getElementById("message");
+
+        /* ---------- Validate Form Fields ---------- */
+
+        const nameValid = nameField.value.trim().length > 0;
+        const emailValid = isValidEmail(emailField.value.trim());
+        const messageValid = messageField.value.trim().length > 0;
+
+        /* ---------- Show/Remove Errors ---------- */
+
+        setFieldError(nameField, !nameValid);
+        setFieldError(emailField, !emailValid);
+        setFieldError(messageField, !messageValid);
+
+        /* ---------- Stop if Form is Invalid ---------- */
+
+        if (!nameValid || !emailValid || !messageValid) {
+
+            const firstInvalid = contactForm.querySelector(
+                ".has-error input, .has-error textarea"
+            );
+
+            if (firstInvalid) {
+                firstInvalid.focus();
+            }
+
+            return;
         }
-      });
-    });
-  }
 
+        /* ---------- Collect Form Data ---------- */
+
+        const formData = new FormData(contactForm);
+
+        const name = formData.get("name");
+        const business = formData.get("business");
+        const email = formData.get("email");
+        const phone = formData.get("phone");
+        const service = formData.get("service");
+        const message = formData.get("message");
+
+        /* ---------- WhatsApp Number ---------- */
+
+        const whatsappNumber = "254724224747";
+
+        /* ---------- Create WhatsApp Message ---------- */
+
+        const whatsappMessage = `
+Hello, I have a new enquiry from the website.
+
+*Name:* ${name}
+*Business Name:* ${business || "Not provided"}
+*Email:* ${email}
+*Phone:* ${phone || "Not provided"}
+*Service Needed:* ${service || "Not specified"}
+
+*Message:*
+${message}
+`;
+
+        /* ---------- Encode WhatsApp Message ---------- */
+
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+
+        /* ---------- Create WhatsApp URL ---------- */
+
+        const whatsappURL =
+            `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+        /* ---------- Open WhatsApp ---------- */
+
+        window.open(whatsappURL, "_blank");
+
+        /* ---------- Show Success Message ---------- */
+
+        formSuccess.classList.add("is-visible");
+
+        /* ---------- Reset Form ---------- */
+
+        contactForm.reset();
+
+    });
+
+    /* ---------- Live Validation ---------- */
+
+    ["name", "email", "message"].forEach(function (id) {
+
+        const field = document.getElementById(id);
+
+        field.addEventListener("input", function () {
+
+            if (id === "email") {
+
+                setFieldError(
+                    field,
+                    field.value.trim().length > 0 &&
+                    !isValidEmail(field.value.trim())
+                );
+
+            } else {
+
+                setFieldError(field, false);
+
+            }
+
+        });
+
+    });
+
+}
 });

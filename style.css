@@ -164,7 +164,7 @@ p {
 }
 
 .btn-gold {
-  background: var(--gold);
+  background: rgb(44, 201, 44);
   color: var(--navy-ink);
 }
 
@@ -778,9 +778,9 @@ p {
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
-  max-width: 820px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
